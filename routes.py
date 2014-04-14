@@ -4,7 +4,6 @@ from flask import Flask, render_template, request, g
 
 #initialize the Flask object
 app = Flask(__name__)
-app.config.from_object(__name__)
 
 #change config settings from default
 app.config.update(dict(
@@ -20,6 +19,15 @@ def connect_db():
   rv = sqlite3.connect(app.config['DATABASE'])
   rv.row_factory = sqlite3.Row #treats rows like dicts
   return rv
+
+#method to create the database
+def init_db():
+  #must explicitly declare app context bc there's no request yet
+  with app.app_context():
+    db = get_db()
+    with app.open_resource('schema.sql', mode='r') as f:
+      db.cursor().executescript(f.read())
+    db.commit()
 
 def get_db():
   #Opens db connection if one doesn't exist
