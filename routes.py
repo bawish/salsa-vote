@@ -44,9 +44,12 @@ def close_db(error):
   if hasattr(g, 'sqlite_db'): #checks to see if db conn exists
     g.sqlite_db.close()
 
-@app.route('/')
-def vote():
-  return render_template('vote.html')
+@app.route('/salsa')
+def vote_salsa():
+  db = get_db()
+  cur = db.execute("SELECT * FROM salsas WHERE type='salsa' ORDER BY table_no ASC")
+  salsa_entries = cur.fetchall()
+  return render_template('salsa_vote.html', salsa_entries = salsa_entries)
 
 if __name__ == '__main__':
   app.run()
