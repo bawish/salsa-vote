@@ -1,6 +1,7 @@
 import os
 import sqlite3
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, redirect, url_for
+from werkzeug.utils import secure_filename
 
 #initialize the Flask object
 app = Flask(__name__)
@@ -14,10 +15,16 @@ app.config.update(dict(
   PASSWORD='default'
 ))
 
+#upload settings
+UPLOAD_FOLDER = '/Users/barrett/Code/salsa-vote/static/img'
+ALLOWED_EXTENSIONS = set(['jpg', 'png', 'jpeg', 'gif'])
+
+#the next few methods are for database connections
 def connect_db():
   #Connects to the specific database
+  #rv transforms db rows into dicts (i think)
   rv = sqlite3.connect(app.config['DATABASE'])
-  rv.row_factory = sqlite3.Row #treats rows like dicts
+  rv.row_factory = sqlite3.Row
   return rv
 
 #method to create the database
@@ -44,12 +51,14 @@ def close_db(error):
   if hasattr(g, 'sqlite_db'): #checks to see if db conn exists
     g.sqlite_db.close()
 
+'''
 @app.route('/salsa')
 def vote_salsa():
   db = get_db()
   cur = db.execute("SELECT * FROM salsas WHERE type='salsa' ORDER BY table_no ASC")
   salsa_entries = cur.fetchall()
   return render_template('salsa_vote.html', salsa_entries = salsa_entries)
+'''
 
 if __name__ == '__main__':
   app.run()
